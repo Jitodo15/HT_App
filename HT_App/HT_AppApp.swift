@@ -14,6 +14,7 @@ import NIO
 class DatabaseManager {
     static let shared = DatabaseManager()
     private var connection: PostgresConnection?
+    private var eventLoopGroup: MultiThreadedEventLoopGroup?
 
     private init() {}
 
@@ -32,7 +33,7 @@ class DatabaseManager {
         print(ProcessInfo.processInfo.environment)
 
 
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        self.eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let logger = Logger(label: "PostgreSQL")
 
         let configuration = PostgresConnection.Configuration(
@@ -46,7 +47,7 @@ class DatabaseManager {
 
         do {
             self.connection = try await PostgresConnection.connect(
-                on: eventLoopGroup.next(),
+                on: eventLoopGroup!.next(),
                 configuration: configuration,
                 id: .init(1),
                 logger: logger
@@ -59,7 +60,20 @@ class DatabaseManager {
     
 
     func getConnection() -> PostgresConnection? {
+        guard let connection = connection else {
+            print("❌ Database not connected")
+            return nil
+        }
         return connection
+    }
+    
+    func closeConnection() {
+        try? connection?.close().wait()
+        eventLoopGroup?.shutdownGracefully { error in
+            if let error = error {
+                print("❌ Error shutting down event loop group: \(error)")
+            }
+        }
     }
     
 }
