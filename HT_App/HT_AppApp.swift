@@ -15,11 +15,7 @@ class DatabaseManager {
     static let shared = DatabaseManager()
     private var connection: PostgresConnection?
     private var eventLoopGroup: MultiThreadedEventLoopGroup?
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 823c957 (Tabs worked on)
     private init() {}
     
     func connectToDatabase() async {
@@ -34,7 +30,7 @@ class DatabaseManager {
         print("Connecting to database with the following details:")
         print("Host: \(host), Port: \(port), Username: \(username), Database: \(database)")
         
-<<<<<<< HEAD
+
         guard let host = ProcessInfo.processInfo.environment["DB_HOST"],
               let portString = ProcessInfo.processInfo.environment["DB_PORT"],
               let port = Int(portString),
@@ -49,9 +45,7 @@ class DatabaseManager {
 
 
         self.eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-=======
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
->>>>>>> 823c957 (Tabs worked on)
+
         let logger = Logger(label: "PostgreSQL")
         
         let configuration = PostgresConnection.Configuration(
@@ -64,7 +58,6 @@ class DatabaseManager {
         )
         
         do {
-            // establishing the connection to postgreSQL
             self.connection = try await PostgresConnection.connect(
                 on: eventLoopGroup!.next(),
                 configuration: configuration,
@@ -86,7 +79,7 @@ class DatabaseManager {
         return connection
     }
     
-<<<<<<< HEAD
+
     func closeConnection() {
         try? connection?.close().wait()
         eventLoopGroup?.shutdownGracefully { error in
@@ -103,62 +96,14 @@ struct HT_AppApp: App {
     init() {
         Task {
             await DatabaseManager.shared.connectToDatabase()
-=======
-    func closeConnection () {
-        try? connection?.close().wait()
-        eventLoopGroup?.shutdownGracefully { error in
-            if let error = error {
-                print("Error shutting down event loop group: \(error)")
-            }
->>>>>>> 823c957 (Tabs worked on)
         }
     }
     
-    //    func validateUser(username: String, password: String) async -> Bool {
-    //        guard let connection = self.connection else {
-    //            print("❌ No database connection")
-    //            return false
-    //        }
-    //
-    //        let query = "SELECT * FROM users WHERE username = $1 AND password = $2"
-    //
-    //        let params: [PostgresData] = [
-    //            PostgresData(string: username),
-    //            PostgresData(string: password)
-    //        ]
-    //
-    //
-    //        do {
-    //            let result = try await connection.query(query, params)
-    //
-    //            if result.count > 0 {
-    //                print("✅ User found")
-    //                return true
-    //            } else {
-    //                print("❌ Invalid credentials")
-    //                return false
-    //            }
-    //        } catch {
-    //            print("❌ Error querying database: \(error)")
-    //            return false
-    //        }
-    //    }
-    //
-    //}
-    
-    @main
-    struct HT_AppApp: App {
-        init() {
-            Task {
-                await DatabaseManager.shared.connectToDatabase()
-            }
-        }
-        
-        var body: some Scene {
-            WindowGroup {
-                NavigationView {
-                    AppTabView()
-                }
+
+    var body: some Scene {
+        WindowGroup {
+            NavigationView {
+                ContentView()
             }
         }
     }
