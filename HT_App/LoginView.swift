@@ -14,12 +14,11 @@ struct LoginView: View {
     @State var username: String = ""
     @State var password: String = ""
     @State var isPasswordVisible: Bool = false
-    @State var isLoginSuccessful: Bool? = nil
+    @State var isLoginSuccessful: Bool = false
     @State var errorMessage: String? = nil
     @State var showAlert: Bool = false
     @State var alertMessage: String = ""
 
-    
     func hashPassword(password: String) -> String {
         let passwordData = Data(password.utf8)
         let hashed = SHA256.hash(data: passwordData)
@@ -66,7 +65,7 @@ struct LoginView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack{
             VStack{
                 Text("Welcome Back!")
                     .font(.largeTitle)
@@ -120,30 +119,29 @@ struct LoginView: View {
                 .disabled(username.isEmpty || password.isEmpty)
                 
                 HStack{
-                    NavigationLink(destination: SignupView()) {
+                    NavigationLink(destination: SignupView().navigationBarBackButtonHidden(true) ) {
                         Text("Don't have an account? Sign Up")
                             .fontWeight(.thin)
                             .foregroundColor(.blue)
                             .underline()
                     }
+                    
+                    
                     Spacer()
                     Text("Forgot Password?")
                         .fontWeight(.thin)
                         .foregroundStyle(Color.blue)
                         .underline()
-                }.padding(.top, 16)
+                }
+                .padding(.top, 16)
+                .navigationDestination(isPresented: $isLoginSuccessful) {
+                        ContentView()
+                            .navigationBarBackButtonHidden(true)
+                }
             }
             .padding()
-            .alert(isPresented: $showAlert) {
-                Alert(title: Text("Login Status"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-            }
-//            .alert(isPresented: Binding<Bool>(
-//                get: { isLoginSuccessful ?? false },
-//                set: { isLoginSuccessful = $0 ? true : nil }
-//            )) {
-//                Alert(title: Text("Login Success"), message: Text("You are now logged in!"), dismissButton: .default(Text("OK")))
-//            }
         }
+
     }
 }
 
