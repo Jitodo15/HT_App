@@ -19,18 +19,7 @@ class DatabaseManager {
     private init() {}
     
     func connectToDatabase() async {
-        // directly using the provided details for my own local PostgreSQL instance
-        let host = "localhost"
-        let port = 5432
-        let username = "postgres"
-        let password = "htapp25"
-        let database = "postgres"
         
-        // checking if these values are correct
-        print("Connecting to database with the following details:")
-        print("Host: \(host), Port: \(port), Username: \(username), Database: \(database)")
-        
-
         guard let host = ProcessInfo.processInfo.environment["DB_HOST"],
               let portString = ProcessInfo.processInfo.environment["DB_PORT"],
               let port = Int(portString),
@@ -78,7 +67,7 @@ class DatabaseManager {
         }
         return connection
     }
-    
+
 
     func closeConnection() {
         try? connection?.close().wait()
@@ -91,19 +80,23 @@ class DatabaseManager {
     
 }
 
+
+           
+            
 @main
+
 struct HT_AppApp: App {
     init() {
         Task {
             await DatabaseManager.shared.connectToDatabase()
         }
     }
-    
-
+                
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView()
+                AppTabView()
+
             }
         }
     }
