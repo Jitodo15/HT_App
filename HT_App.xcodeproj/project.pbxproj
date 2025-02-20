@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		31AE1ED12D4C003600B61FE1 /* PostgresNIO in Frameworks */ = {isa = PBXBuildFile; productRef = 31AE1ED02D4C003600B61FE1 /* PostgresNIO */; };
 		31AE1ED32D4C003600B61FE1 /* _ConnectionPoolModule in Frameworks */ = {isa = PBXBuildFile; productRef = 31AE1ED22D4C003600B61FE1 /* _ConnectionPoolModule */; };
+		31B95CD02D5EF32800A84A3C /* PostgresClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 31B95CCF2D5EF32800A84A3C /* PostgresClientKit */; };
 		31B9FB8B2D46D0580069A815 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31B9FB8A2D46D0580069A815 /* UIKit.framework */; platformFilters = (ios, xros, ); };
 /* End PBXBuildFile section */
 
@@ -62,6 +63,7 @@
 				31B9FB8B2D46D0580069A815 /* UIKit.framework in Frameworks */,
 				31AE1ED32D4C003600B61FE1 /* _ConnectionPoolModule in Frameworks */,
 				31AE1ED12D4C003600B61FE1 /* PostgresNIO in Frameworks */,
+				31B95CD02D5EF32800A84A3C /* PostgresClientKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +135,7 @@
 			packageProductDependencies = (
 				31AE1ED02D4C003600B61FE1 /* PostgresNIO */,
 				31AE1ED22D4C003600B61FE1 /* _ConnectionPoolModule */,
+				31B95CCF2D5EF32800A84A3C /* PostgresClientKit */,
 			);
 			productName = HT_App;
 			productReference = 31B9FB202D46C59F0069A815 /* HT_App.app */;
@@ -218,6 +221,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				31AE1ECF2D4C003600B61FE1 /* XCRemoteSwiftPackageReference "postgres-nio" */,
+				31B95CCE2D5EF32800A84A3C /* XCRemoteSwiftPackageReference "PostgresClientKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 31B9FB212D46C59F0069A815 /* Products */;
@@ -420,6 +424,9 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HT-App-Info.plist";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location to track the shuttle even when the app is in the background";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to proceed with the signup";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -461,6 +468,9 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HT-App-Info.plist";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location to track the shuttle even when the app is in the background";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to proceed with the signup";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -629,6 +639,14 @@
 				minimumVersion = 1.15.0;
 			};
 		};
+		31B95CCE2D5EF32800A84A3C /* XCRemoteSwiftPackageReference "PostgresClientKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/codewinsdotcom/PostgresClientKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -641,6 +659,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 31AE1ECF2D4C003600B61FE1 /* XCRemoteSwiftPackageReference "postgres-nio" */;
 			productName = _ConnectionPoolModule;
+		};
+		31B95CCF2D5EF32800A84A3C /* PostgresClientKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 31B95CCE2D5EF32800A84A3C /* XCRemoteSwiftPackageReference "PostgresClientKit" */;
+			productName = PostgresClientKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

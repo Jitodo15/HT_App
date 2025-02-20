@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import CryptoKit
 import PostgresNIO
+import CoreLocation
 
 struct SignupView: View {
     @State var fullName: String = ""
@@ -19,6 +20,13 @@ struct SignupView: View {
     @State var isPasswordVisible: Bool = false
     @State var isConfirmPasswordVisible: Bool = false
     @State var isSignupSuccess: Bool = false
+    @State private var selectedRole = "student"
+    let roles = ["student", "driver"]
+    @State private var latitude: Double?
+    @State private var longitude: Double?
+    @StateObject private var locationManager = LocationManager()
+    
+ 
     
     func hashPassword(password: String) -> String {
         let passwordData = Data(password.utf8)
@@ -27,6 +35,8 @@ struct SignupView: View {
     }
     
     func signup() {
+        print("✅ signUp() function called")
+
         if password != confirmPassword {
             print("Passwords don't match.")
             return
@@ -34,26 +44,34 @@ struct SignupView: View {
             
         let hashedPassword = hashPassword(password: password)
             
+        guard let lat = latitude, let lon = longitude else {
+            print("Location not available")
+            return
+        }
+
         Task {
-            await insertUserToDatabase(fullName: fullName, email: email, username: username, passwordHash: hashedPassword)
+            await insertUserToDatabase(fullName: fullName, email: email, username: username, passwordHash: hashedPassword, selectedRole: selectedRole, latitude: lat, longitude: lon)
         }
     }
         
-    func insertUserToDatabase(fullName: String, email: String, username: String, passwordHash: String) async {
+    func insertUserToDatabase(fullName: String, email: String, username: String, passwordHash: String, selectedRole: String, latitude: Double, longitude: Double) async {
         guard let connection = DatabaseManager.shared.getConnection() else {
             print("❌ No active database connection")
             return
         }
             
         let sql = """
-        INSERT INTO users (full_name, email, username, password, created_at)
-        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP);
+        INSERT INTO users (full_name, email, username, password, created_at, role, latitude, longitude)
+                VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, $5, $6, $7);
         """
         let parameters: [PostgresData] = [
             PostgresData(string: fullName),
             PostgresData(string: email),
             PostgresData(string: username),
-            PostgresData(string: passwordHash)
+            PostgresData(string: passwordHash),
+            PostgresData(string: selectedRole),
+            PostgresData(double: latitude),
+            PostgresData(double: longitude)
         ]
         
         do {
@@ -61,6 +79,7 @@ struct SignupView: View {
             print("✅ User inserted successfully!")
             isSignupSuccess = true
             clearFields()
+//            ContentView()
         } catch {
             print("❌ Error inserting user: \(error)")
         }
@@ -75,7 +94,7 @@ struct SignupView: View {
     }
     
     var body: some View {
-        NavigationView{
+        NavigationStack{
             VStack{
                 Text("Get Started")
                     .font(.largeTitle)
@@ -113,6 +132,7 @@ struct SignupView: View {
                     }.padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(10)
+                    
                     HStack {
                         if isConfirmPasswordVisible {
                             TextField("Confirm Password", text: $confirmPassword)
@@ -128,6 +148,13 @@ struct SignupView: View {
                      .cornerRadius(10)
                 }
                 .padding(.bottom, 22)
+                Picker("Role", selection: $selectedRole) {
+                    ForEach(roles, id: \.self) { role in
+                        Text(role.capitalized).tag(role)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
                 
                 Button(action: signup){
                     Text("Sign Up")
@@ -141,7 +168,7 @@ struct SignupView: View {
                 }
                 .disabled(fullName.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty || confirmPassword.isEmpty)
                 HStack{
-                    NavigationLink(destination: LoginView()) {
+                    NavigationLink(destination: LoginView().navigationBarBackButtonHidden(true)) {
                         Text("Already have an account? Log In")
                             .fontWeight(.thin)
                             .foregroundStyle(Color.blue)
@@ -149,10 +176,27 @@ struct SignupView: View {
                     }
                     Spacer()
                     
-                }.padding(.top, 16)
+                }
+                .padding(.top, 16)
+    
+                .navigationDestination(isPresented: $isSignupSuccess) {
+                        ContentView()
+                          .navigationBarBackButtonHidden(true)
+                }
                 
             }
             .padding()
+            .onAppear {
+                locationManager.startUpdatingLocation()
+            }
+            .onReceive(locationManager.$location) { newLocation in
+                if let newLocation = newLocation {
+                    latitude = newLocation.coordinate.latitude
+                    longitude = newLocation.coordinate.longitude
+//                    print("Current Location: \(latitude!), \(longitude!)")
+                }
+            }
+
             
         }
     }

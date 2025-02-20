@@ -1,6 +1,24 @@
 {
-  "originHash" : "a0ec00e94d10d475b65a6fb21cea566c426bad60f31d3abc240324e6b249e0f2",
+  "originHash" : "7375b70daa9060fd572ddc96113b3b04acfebe20828e137b2433857ed132db9f",
   "pins" : [
+    {
+      "identity" : "bluesocket",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Kitura/BlueSocket.git",
+      "state" : {
+        "revision" : "7b23a867008e0027bfd6f4d398d44720707bc8ca",
+        "version" : "2.0.4"
+      }
+    },
+    {
+      "identity" : "bluesslservice",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Kitura/BlueSSLService",
+      "state" : {
+        "revision" : "b27a94d063962dfa1bba9f79814c4ef202cf33a4",
+        "version" : "2.0.2"
+      }
+    },
     {
       "identity" : "postgres-nio",
       "kind" : "remoteSourceControl",
@@ -8,6 +26,15 @@
       "state" : {
         "revision" : "fd0e415a705c490499f983639b04f491a2ed9d99",
         "version" : "1.23.0"
+      }
+    },
+    {
+      "identity" : "postgresclientkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/codewinsdotcom/PostgresClientKit",
+      "state" : {
+        "revision" : "356ffe0c43722f192d796300557b3b530a0baebc",
+        "version" : "1.5.0"
       }
     },
     {

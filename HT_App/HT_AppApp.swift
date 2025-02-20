@@ -10,26 +10,37 @@ import SwiftUI
 import PostgresNIO
 import Logging
 import NIO
+import NIOSSL
+import os.log
 
 class DatabaseManager {
     static let shared = DatabaseManager()
     private var connection: PostgresConnection?
     private var eventLoopGroup: MultiThreadedEventLoopGroup?
 
-    private init() {}
+    private init() { }
     
     func connectToDatabase() async {
         
-        guard let host = ProcessInfo.processInfo.environment["DB_HOST"],
-              let portString = ProcessInfo.processInfo.environment["DB_PORT"],
-              let port = Int(portString),
-              let username = ProcessInfo.processInfo.environment["DB_USERNAME"],
-              let password = ProcessInfo.processInfo.environment["DB_PASSWORD"],
-              let database = ProcessInfo.processInfo.environment["DB_NAME"] else {
-            print("❌ Missing database credentials")
-            
+        guard let dbURLString = ProcessInfo.processInfo.environment["DB_URL"],
+            let dbURL = URL(string: dbURLString) else {
+            print("❌ DATABASE_URL environment variable is missing or invalid")
+                return
+            }
+                
+        guard let host = dbURL.host,
+            let username = dbURL.user,
+            let password = dbURL.password else {
+            print("❌ Error extracting database credentials")
             return
         }
+                
+        let database = dbURL.lastPathComponent
+        let port = dbURL.port ?? 5432  
+        print("🚀 Connecting to Render PostgreSQL at \(host):\(port)...")
+    
+        
+     
         print(ProcessInfo.processInfo.environment)
 
 
@@ -37,13 +48,14 @@ class DatabaseManager {
 
         let logger = Logger(label: "PostgreSQL")
         
+        let tlsConfiguration = try? NIOSSLContext(configuration: .clientDefault)
         let configuration = PostgresConnection.Configuration(
             host: host,
             port: port,
             username: username,
             password: password,
             database: database,
-            tls: .disable  // use `.requireTLS` only if connecting to a remote database with SSL
+            tls: tlsConfiguration == nil ? .disable : .require(tlsConfiguration!)  // use `.requireTLS` only if connecting to a remote database with SSL
         )
         
         do {
@@ -55,7 +67,11 @@ class DatabaseManager {
             )
             print("✅ Connected to PostgreSQL successfully!")
         } catch {
-            print("❌ Database Connection Failed: \(error)")
+            os_log("❌ Database Connection Failed with error: %@", log: .default, type: .error, String(reflecting: error))
+
+
+            print("❌ Database Connection Failed: \(String(reflecting: error))")
+        
         }
     }
     
@@ -67,7 +83,7 @@ class DatabaseManager {
         }
         return connection
     }
-
+    
 
     func closeConnection() {
         try? connection?.close().wait()
@@ -80,23 +96,19 @@ class DatabaseManager {
     
 }
 
-
-           
-            
 @main
-
 struct HT_AppApp: App {
     init() {
         Task {
             await DatabaseManager.shared.connectToDatabase()
         }
     }
-                
+    
+
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                AppTabView()
-
+                SignupView()
             }
         }
     }

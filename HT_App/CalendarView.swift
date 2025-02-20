@@ -5,6 +5,7 @@
 //  Created by Ayomide Isinkaye on 2/3/25.
 //
 
+import Foundation
 import SwiftUI
 
 struct Event: Identifiable {
@@ -21,7 +22,7 @@ struct CalendarView: View {
     @State private var selectedColor: Color = .red
     @State private var events: [Event] = []
     @State private var searchText: String = ""
-    
+
     var filteredEvents: [Event] {
         if searchText.isEmpty {
             return events.filter { Calendar.current.isDate($0.date, inSameDayAs: selectedDate) }
@@ -37,7 +38,7 @@ struct CalendarView: View {
                 TextField("Search events...", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
-                
+
                 Button(action: { searchText = "" }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.gray)
@@ -45,7 +46,7 @@ struct CalendarView: View {
                 }
             }
             .padding(.top)
-            
+
             // calendar display
             DatePicker("Select a date", selection: $selectedDate, displayedComponents: .date)
                 .datePickerStyle(.graphical)
@@ -100,6 +101,7 @@ struct CalendarView: View {
         events.append(newEvent)
         newEventTitle = ""
         isTyping = false
+        Text("Calendar Page")
     }
 }
 
