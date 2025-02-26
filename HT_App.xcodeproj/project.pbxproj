@@ -11,6 +11,7 @@
 		31AE1ED32D4C003600B61FE1 /* _ConnectionPoolModule in Frameworks */ = {isa = PBXBuildFile; productRef = 31AE1ED22D4C003600B61FE1 /* _ConnectionPoolModule */; };
 		31B95CD02D5EF32800A84A3C /* PostgresClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 31B95CCF2D5EF32800A84A3C /* PostgresClientKit */; };
 		31B9FB8B2D46D0580069A815 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31B9FB8A2D46D0580069A815 /* UIKit.framework */; platformFilters = (ios, xros, ); };
+		31BEC6BC2D6C4D9A00BB8E88 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 31BEC6BB2D6C4D9A00BB8E88 /* GoogleMaps */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 			files = (
 				31B9FB8B2D46D0580069A815 /* UIKit.framework in Frameworks */,
 				31AE1ED32D4C003600B61FE1 /* _ConnectionPoolModule in Frameworks */,
+				31BEC6BC2D6C4D9A00BB8E88 /* GoogleMaps in Frameworks */,
 				31AE1ED12D4C003600B61FE1 /* PostgresNIO in Frameworks */,
 				31B95CD02D5EF32800A84A3C /* PostgresClientKit in Frameworks */,
 			);
@@ -136,6 +138,7 @@
 				31AE1ED02D4C003600B61FE1 /* PostgresNIO */,
 				31AE1ED22D4C003600B61FE1 /* _ConnectionPoolModule */,
 				31B95CCF2D5EF32800A84A3C /* PostgresClientKit */,
+				31BEC6BB2D6C4D9A00BB8E88 /* GoogleMaps */,
 			);
 			productName = HT_App;
 			productReference = 31B9FB202D46C59F0069A815 /* HT_App.app */;
@@ -222,6 +225,7 @@
 			packageReferences = (
 				31AE1ECF2D4C003600B61FE1 /* XCRemoteSwiftPackageReference "postgres-nio" */,
 				31B95CCE2D5EF32800A84A3C /* XCRemoteSwiftPackageReference "PostgresClientKit" */,
+				31BEC6BA2D6C4D9A00BB8E88 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 31B9FB212D46C59F0069A815 /* Products */;
@@ -425,8 +429,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "HT-App-Info.plist";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location to track the shuttle even when the app is in the background";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to proceed with the signup";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Your location is needed to show directions.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is needed to show directions.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -469,8 +474,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "HT-App-Info.plist";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location to track the shuttle even when the app is in the background";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to proceed with the signup";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Your location is needed to show directions.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is needed to show directions.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -647,6 +653,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		31BEC6BA2D6C4D9A00BB8E88 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -664,6 +678,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 31B95CCE2D5EF32800A84A3C /* XCRemoteSwiftPackageReference "PostgresClientKit" */;
 			productName = PostgresClientKit;
+		};
+		31BEC6BB2D6C4D9A00BB8E88 /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 31BEC6BA2D6C4D9A00BB8E88 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

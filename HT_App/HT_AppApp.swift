@@ -11,6 +11,7 @@ import PostgresNIO
 import Logging
 import NIO
 import NIOSSL
+import GoogleMaps
 import os.log
 
 class DatabaseManager {
@@ -99,6 +100,9 @@ class DatabaseManager {
 @main
 struct HT_AppApp: App {
     init() {
+        var api_key = ProcessInfo.processInfo.environment["MAP_API_KEY"]
+        print(api_key ?? "")
+        GMSServices.provideAPIKey(ProcessInfo.processInfo.environment["MAP_API_KEY"] as! String)
         Task {
             await DatabaseManager.shared.connectToDatabase()
         }
