@@ -99,9 +99,10 @@ class DatabaseManager {
 
 @main
 struct HT_AppApp: App {
+    @StateObject private var locationManager = LocationManager()
+    
     init() {
         var api_key = ProcessInfo.processInfo.environment["MAP_API_KEY"]
-        print(api_key ?? "")
         GMSServices.provideAPIKey(ProcessInfo.processInfo.environment["MAP_API_KEY"] as! String)
         Task {
             await DatabaseManager.shared.connectToDatabase()
@@ -113,7 +114,61 @@ struct HT_AppApp: App {
         WindowGroup {
             NavigationView {
                 SignupView()
+                    .onAppear {
+                        locationManager.startUpdatingLocation()
+                        startPeriodicLocationUpdates()
+                    }
             }
+        }
+    }
+    
+    private func startPeriodicLocationUpdates() {
+        Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in // Every 5 minutes
+            Task {
+                await updateUserLocation()
+            }
+        }
+    }
+
+    private func updateUserLocation() async {
+        guard let userLocation = locationManager.location else {
+            print("❌ Location not available yet")
+            return
+        }
+            
+        let latitude = userLocation.coordinate.latitude
+        let longitude = userLocation.coordinate.longitude
+            
+        guard let userID = fetchCurrentUserID() else {
+            print("❌ No logged-in user")
+            return
+        }
+
+            await updateUserLocationInDatabase(userID: userID, latitude: latitude, longitude: longitude)
+    }
+        
+    private func fetchCurrentUserID() -> Int? {
+            // Implement a way to get the currently logged-in user's ID
+            // This could be from UserDefaults, AppStorage, or a global state manager
+        return UserDefaults.standard.integer(forKey: "userID")
+    }
+        
+    private func updateUserLocationInDatabase(userID: Int, latitude: Double, longitude: Double) async {
+        guard let connection = DatabaseManager.shared.getConnection() else {
+            print("❌ No active database connection")
+            return
+        }
+            
+        let sql = "UPDATE users SET latitude = $1, longitude = $2 WHERE id = $3"
+        let latData = PostgresData(double: latitude)
+        let lonData = PostgresData(double: longitude)
+        let userIDData = PostgresData(int: userID)
+            
+        do {
+            try await connection.query(sql, [latData, lonData, userIDData]).get()
+            print("✅ Location updated successfully for user \(userID)")
+        } catch {
+            print("❌ Error updating location: \(error)")
         }
     }
 }

@@ -3,15 +3,14 @@ import GoogleMaps
 import CoreLocation
 
 class MapViewController: UIViewController {
-    
     var mapView: GMSMapView!
     var driverMarker: GMSMarker!
     var studentMarker: GMSMarker!
     var routePolyline: GMSPolyline?
     var etaLabel: UILabel!
     
-    let driverEmail = "timo@gmail.com"
-    let studentEmail = "joy@gmail.com"
+    let driverEmail = "joy@gmail.com"
+    let studentEmail = "me@gmail.com"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +20,6 @@ class MapViewController: UIViewController {
         setupMarkers()
         fetchLocations()
         Timer.scheduledTimer(timeInterval: 15.0, target: self, selector: #selector(fetchLocations), userInfo: nil, repeats: true)
-        
-        
     }
     
     private func setupETALabel() {
@@ -64,9 +61,16 @@ class MapViewController: UIViewController {
     
     private func setupMarkers() {
         driverMarker = GMSMarker()
-        driverMarker.icon = UIImage(named: "car_icon")?.withRenderingMode(.alwaysOriginal)
+//        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold)
+//        let sfSymbol = UIImage(systemName: "car.fill", withConfiguration: symbolConfig)?.withRenderingMode(.alwaysOriginal)
+//
+//        driverMarker.icon = sfSymbol
+
+//        driverMarker.icon = UIImage(named: "car_icon")?.withRenderingMode(.alwaysOriginal)
+        driverMarker.icon = GMSMarker.markerImage(with: .red)
         driverMarker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
         driverMarker.map = mapView
+        
      
         studentMarker = GMSMarker()
         studentMarker.icon = GMSMarker.markerImage(with: .green)
@@ -75,6 +79,8 @@ class MapViewController: UIViewController {
     }
     
     @objc private func fetchLocations() {
+        print("Fetching locations...")
+        
         Task {
             async let driverLocation = ShuttleDataFetcher.fetchUserLocation(email: driverEmail, isDriver: true)
             async let studentLocation = ShuttleDataFetcher.fetchUserLocation(email: studentEmail, isDriver: false)
@@ -93,6 +99,13 @@ class MapViewController: UIViewController {
                 fetchETA(from: driver.coordinate, to: student.coordinate)
                 print("yes")
             }
+            
+            DispatchQueue.main.async {
+                self.mapView.clear() // Clear previous markers and route
+                self.driverMarker.map = self.mapView
+                self.studentMarker.map = self.mapView
+                self.routePolyline?.map = self.mapView
+            }
         }
     }
     
@@ -105,6 +118,8 @@ class MapViewController: UIViewController {
     }
     
     private func updateCarMarker(_ marker: GMSMarker, with coordinate: CLLocationCoordinate2D, title: String) {
+        print("Updating driver marker to: \(coordinate.latitude), \(coordinate.longitude)")
+
         CATransaction.begin()
         CATransaction.setAnimationDuration(1.5)
         
@@ -115,27 +130,15 @@ class MapViewController: UIViewController {
         marker.rotation = bearing
         marker.title = title
         
-//        updateETALabelPosition(for: coordinate)
-        
         CATransaction.commit()
     }
     
-//    private func updateETALabelPosition(for coordinate: CLLocationCoordinate2D) {
-//        // Convert the car's coordinate into screen coordinates
-//        let projection = mapView.projection
-//        let point = projection.point(for: coordinate)
-//        
-//        // Adjust the position of the ETA label based on the car's location on the map
-//        etaLabel.frame.origin = CGPoint(x: point.x - etaLabel.frame.size.width / 2, y: point.y - etaLabel.frame.size.height - 10)
-//    }
 
 
     @objc private func fetchETA(from origin: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D) {
         let originStr = "\(origin.latitude),\(origin.longitude)"
         let destinationStr = "\(destination.latitude),\(destination.longitude)"
-        
         let apiKey = "AIzaSyC2yPOEWxrF_381zpLA8ZSyUqCMzC3C6nA"
-
 
         guard let url = URL(string: "https://maps.googleapis.com/maps/api/directions/json?origin=\(originStr)&destination=\(destinationStr)&mode=driving&departure_time=now&key=\(apiKey)") else { return }
         print(url)
@@ -143,7 +146,6 @@ class MapViewController: UIViewController {
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else { return }
 
-            
             do {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                    let routes = json["routes"] as? [[String: Any]],
@@ -164,16 +166,6 @@ class MapViewController: UIViewController {
 //                    let arrivalTimeText = dateFormatter.string(from: arrivalDate)
                     print("✅ Estimated Time: \(durationText)")
                     
-//                    DispatchQueue.main.async {
-//                        // Create a strong reference to etaLabel before using it
-//                        guard let etaLabel = self.etaLabel else {
-//                            print("❌ etaLabel is still nil on main thread.")
-//                            return
-//                        }
-//                        self.updateUIWithETA(durationText: durationText)
-////                        self.updateUIWithETA(durationText: durationText, arrivalTimeText: arrivalTimeText)
-//
-//                    }
                     DispatchQueue.main.async {
                         if self.etaLabel == nil {
                            self.setupETALabel()

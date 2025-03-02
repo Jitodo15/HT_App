@@ -21,6 +21,7 @@ struct ShuttleView: View {
     var body: some View {
         MapViewRepresentable()
             .edgesIgnoringSafeArea(.all)
+            .toolbar(.hidden, for: .tabBar)
     }
 }
 

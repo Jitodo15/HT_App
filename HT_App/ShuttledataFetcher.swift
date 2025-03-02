@@ -9,6 +9,14 @@ import Foundation
 import CoreLocation
 @preconcurrency import PostgresNIO
 
+struct UserLocation: Identifiable {
+    let id = UUID()
+    let name: String
+    let coordinate: CLLocationCoordinate2D
+    let isDriver: Bool
+}
+
+
 struct ShuttleDataFetcher {
     
     static func fetchUserLocation(email: String, isDriver: Bool) async -> UserLocation? {
