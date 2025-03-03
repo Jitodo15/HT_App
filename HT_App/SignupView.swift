@@ -26,8 +26,6 @@ struct SignupView: View {
     @State private var longitude: Double?
     @StateObject private var locationManager = LocationManager()
     
- 
-    
     func hashPassword(password: String) -> String {
         let passwordData = Data(password.utf8)
         let hashed = SHA256.hash(data: passwordData)
@@ -79,11 +77,34 @@ struct SignupView: View {
             print("✅ User inserted successfully!")
             isSignupSuccess = true
             clearFields()
-//            ContentView()
         } catch {
             print("❌ Error inserting user: \(error)")
         }
     }
+    
+    func updateUserLocationInDatabase(latitude: Double, longitude: Double) async {
+        guard let connection = DatabaseManager.shared.getConnection() else {
+            print("❌ No active database connection")
+            return
+        }
+
+        let sql = """
+        UPDATE users SET latitude = $1, longitude = $2 WHERE email = $3;
+        """
+        let parameters: [PostgresData] = [
+            PostgresData(double: latitude),
+            PostgresData(double: longitude),
+            PostgresData(string: email) 
+        ]
+
+        do {
+            try await connection.query(sql, parameters)
+            print("✅ User location updated successfully!")
+        } catch {
+            print("❌ Error updating location: \(error)")
+        }
+    }
+
     
     func clearFields() {
         fullName = ""
@@ -193,9 +214,12 @@ struct SignupView: View {
                 if let newLocation = newLocation {
                     latitude = newLocation.coordinate.latitude
                     longitude = newLocation.coordinate.longitude
-//                    print("Current Location: \(latitude!), \(longitude!)")
+                    Task {
+                        await updateUserLocationInDatabase(latitude: latitude!, longitude: longitude!)
+                    }
                 }
             }
+
 
             
         }

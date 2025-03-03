@@ -105,6 +105,11 @@
             value = "postgresql://htapp_user:SJMIQdEBoE1cqe43ku79ss7HtnY1Ipof@dpg-cuqlfntumphs73est38g-a.oregon-postgres.render.com/htapp"
             isEnabled = "YES">
          </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "MAP_API_KEY"
+            value = "AIzaSyC2yPOEWxrF_381zpLA8ZSyUqCMzC3C6nA"
+            isEnabled = "YES">
+         </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction

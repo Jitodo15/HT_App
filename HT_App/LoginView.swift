@@ -18,12 +18,34 @@ struct LoginView: View {
     @State var errorMessage: String? = nil
     @State var showAlert: Bool = false
     @State var alertMessage: String = ""
+    @StateObject private var locationManager = LocationManager()
+
 
     func hashPassword(password: String) -> String {
         let passwordData = Data(password.utf8)
         let hashed = SHA256.hash(data: passwordData)
         return hashed.map { String(format: "%02x", $0) }.joined()
     }
+    
+    func updateUserLocation(userID: Int, latitude: Double, longitude: Double) async {
+        guard let connection = DatabaseManager.shared.getConnection() else {
+            print("❌ No active database connection")
+            return
+        }
+
+        let sql = "UPDATE users SET latitude = $1, longitude = $2 WHERE id = $3"
+        let latData = PostgresData(double: latitude)
+        let lonData = PostgresData(double: longitude)
+        let userIDData = PostgresData(int: userID)
+
+        do {
+            try await connection.query(sql, [latData, lonData, userIDData]).get()
+            print("✅ Location updated successfully")
+        } catch {
+            print("❌ Error updating location: \(error)")
+        }
+    }
+
         
     func login(username: String, password: String) async -> Bool {
         guard let connection = DatabaseManager.shared.getConnection() else {
@@ -37,8 +59,14 @@ struct LoginView: View {
 
         do {
             let result = try await connection.query(sql, [usernameData]).get()
-            if let row = result.first?.makeRandomAccess(), let storedPasswordHash = row[data:"password"].string {
+            if let row = result.first?.makeRandomAccess(), let storedPasswordHash = row[data:"password"].string, let userID = row[data: "id"].int {
                 if storedPasswordHash == hashedPassword {
+                    if let userLocation = locationManager.location {
+                         let latitude = userLocation.coordinate.latitude
+                         let longitude = userLocation.coordinate.longitude
+                         await updateUserLocation(userID: userID, latitude: latitude, longitude: longitude)
+                    }
+
                     alertMessage = "✅ Login successful"
                     showAlert = true
                     clearFields()
@@ -140,6 +168,10 @@ struct LoginView: View {
                 }
             }
             .padding()
+            .onAppear {
+                locationManager.startUpdatingLocation()
+            }
+
         }
 
     }
