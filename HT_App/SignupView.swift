@@ -26,8 +26,6 @@ struct SignupView: View {
     @State private var longitude: Double?
     @StateObject private var locationManager = LocationManager()
     
- 
-    
     func hashPassword(password: String) -> String {
         let passwordData = Data(password.utf8)
         let hashed = SHA256.hash(data: passwordData)

@@ -138,8 +138,8 @@ class MapViewController: UIViewController {
     @objc private func fetchETA(from origin: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D) {
         let originStr = "\(origin.latitude),\(origin.longitude)"
         let destinationStr = "\(destination.latitude),\(destination.longitude)"
-        let apiKey = "AIzaSyC2yPOEWxrF_381zpLA8ZSyUqCMzC3C6nA"
-
+        let apiKey = ProcessInfo.processInfo.environment["MAP_API_KEY"]
+        
         guard let url = URL(string: "https://maps.googleapis.com/maps/api/directions/json?origin=\(originStr)&destination=\(destinationStr)&mode=driving&departure_time=now&key=\(apiKey)") else { return }
         print(url)
 
