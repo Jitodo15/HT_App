@@ -56,8 +56,8 @@ io.on("connection", (socket) => {
         io.emit("location-update", data);
     });
 
-    socket.join(rideId); // when a ride starts
-    io.to(rideId).emit("location-update", data);
+    // socket.join(rideId); // when a ride starts
+    // io.to(rideId).emit("location-update", data);
 
     // In the driver’s app (if using JavaScript, similar for iOS)
     socket.emit("location-update", {
@@ -330,16 +330,13 @@ app.post("/drivers", async (req, res) => {
 });
 
 app.get("/drivers", async (req, res) => {
-    const { route } = req.query; // route can be "inbound" or "outbound"
+    const { route } = req.query; 
     
     try {
         let query = "SELECT * FROM StudentDriver";
         let params = [];
         
         if (route && (route === "inbound" || route === "outbound")) {
-            // For simplicity, assume drivers always have inbound and outbound hours defined.
-            // You might instead add a column that indicates which route they serve.
-            // Here, we simply return all drivers.
         }
         
         const result = await pool.query(query, params);
@@ -512,6 +509,47 @@ app.get("/active-rides", authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 })
+
+const getMealTime = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const day = now.toLocaleString('en-US', { weekday: 'long' });
+  
+    let mealTime = '';
+  
+    if (day === 'Saturday' || day === 'Sunday') {
+   
+      mealTime = hours < 16 ? 'Brunch' : 'Dinner';
+    } else {
+     
+      if (hours < 11) {
+        mealTime = 'Breakfast';
+      } else if (hours < 16) {
+        mealTime = 'Lunch';
+      } else {
+        mealTime = 'Dinner';
+      }
+    }
+  
+    return { day, mealTime };
+};
+
+app.get('/meals', async (req, res) => {
+    try {
+      const { day, mealTime } = getMealTime();
+      
+      // Fetch meals based on current day and time slot
+      const result = await pool.query(
+        'SELECT * FROM menuitem WHERE day = $1 AND meal_time = $2',
+        [day, mealTime]
+      );
+  
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
+});
   
 const PORT = 3000;
 server.listen(PORT, () => {
