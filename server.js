@@ -61,8 +61,9 @@ io.on("connection", (socket) => {
 
     // In the driver’s app (if using JavaScript, similar for iOS)
     socket.emit("location-update", {
-        latitude: currentLatitude,
-        longitude: currentLongitude
+        userId: driverId, // if needed
+        latitude: data.latitude,
+        longitude: data.longitude
     });
 
 
@@ -280,6 +281,7 @@ app.get("/locations", async (req, res) => {
     try {
         const query = "SELECT * FROM users WHERE email = $1";
         const result = await pool.query(query, [email]);
+        
 
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
