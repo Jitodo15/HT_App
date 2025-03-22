@@ -60,11 +60,11 @@ io.on("connection", (socket) => {
     // io.to(rideId).emit("location-update", data);
 
     // In the driver’s app (if using JavaScript, similar for iOS)
-    socket.emit("location-update", {
-        // userId: driverId, // if needed
-        latitude: data.latitude,
-        longitude: data.longitude
-    });
+    // socket.emit("location-update", {
+    //     // userId: driverId, // if needed
+    //     latitude: data.latitude,
+    //     longitude: data.longitude
+    // });
 
 
 
